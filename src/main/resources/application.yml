@@ -1,0 +1,23 @@
+server:
+  port: 8084  # cada microserviço em uma porta diferente
+
+spring:
+  application:
+    name: ms-geo
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/infra_urbana_geolocalizacao
+    username: admin
+    password: password123
+    driver-class-name: org.postgresql.Driver
+
+  spring:
+    jpa:
+      hibernate:
+        ddl-auto: update
+      properties:
+        hibernate:
+          dialect: org.hibernate.dialect.PostgreSQLDialect
+# URLs dos outros microserviços
+ms-ocorrencias:
+  url: http://localhost:8081
