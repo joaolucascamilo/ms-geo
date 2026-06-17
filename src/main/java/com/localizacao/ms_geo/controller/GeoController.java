@@ -3,6 +3,7 @@ package com.localizacao.ms_geo.controller;
 import com.localizacao.ms_geo.dto.EnderecoDTO;
 import com.localizacao.ms_geo.dto.MapaCalorDTO;
 import com.localizacao.ms_geo.dto.OcorrenciaGeoDTO;
+import com.localizacao.ms_geo.dto.OcorrenciaGeoResponseDTO;
 import com.localizacao.ms_geo.model.OcorrenciaGeo;
 import com.localizacao.ms_geo.service.GeoService;
 import jakarta.validation.Valid;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/geo")
@@ -22,12 +24,18 @@ public class GeoController {
 
     // Ocorrências num raio (ex.: 500m ao redor do usuário)
     @GetMapping("/ocorrencias/raio")
-    public ResponseEntity<List<OcorrenciaGeo>> buscarPorRaio(
+    public ResponseEntity<List<OcorrenciaGeoResponseDTO>> buscarPorRaio(
             @RequestParam double lat,
             @RequestParam double lng,
             @RequestParam(defaultValue = "500") double raioMetros
     ) {
-        return ResponseEntity.ok(geoService.buscarOcorrenciasPorRaio(lat, lng, raioMetros));
+        List<OcorrenciaGeoResponseDTO> resultado = geoService
+                .buscarOcorrenciasPorRaio(lat, lng, raioMetros)
+                .stream()
+                .map(OcorrenciaGeoResponseDTO::fromEntity)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(resultado);
     }
 
     // Dados para o mapa de calor
@@ -44,8 +52,9 @@ public class GeoController {
 
     // Recebe uma ocorrência do ms-ocorrencias para registrar no mapa
     @PostMapping("/ocorrencias")
-    public ResponseEntity<OcorrenciaGeo> registrar(@RequestBody @Valid OcorrenciaGeoDTO dto) {
+    public ResponseEntity<OcorrenciaGeoResponseDTO> registrar(@RequestBody @Valid OcorrenciaGeoDTO dto) {
+        OcorrenciaGeo salvo = geoService.salvarOcorrencia(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(geoService.salvarOcorrencia(dto));
+                .body(OcorrenciaGeoResponseDTO.fromEntity(salvo));
     }
 }

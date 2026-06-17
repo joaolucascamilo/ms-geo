@@ -1,5 +1,5 @@
 server:
-  port: 8084  # cada microserviço em uma porta diferente
+  port: 8084
 
 spring:
   application:
@@ -11,13 +11,12 @@ spring:
     password: password123
     driver-class-name: org.postgresql.Driver
 
-  spring:
-    jpa:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
       hibernate:
-        ddl-auto: update
-      properties:
-        hibernate:
-          dialect: org.hibernate.dialect.PostgreSQLDialect
-# URLs dos outros microserviços
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
 ms-ocorrencias:
   url: http://localhost:8081

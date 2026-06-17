@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface OcorrenciaGeoRepository extends JpaRepository<OcorrenciaGeo, UUID> {
+public interface OcorrenciaGeoRepository extends JpaRepository<OcorrenciaGeo, Long> {
 
     // Busca ocorrências num raio de X metros
     @Query(value = """
