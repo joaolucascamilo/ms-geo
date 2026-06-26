@@ -75,6 +75,24 @@ public class GeoService {
         return repository.save(geo);
     }
 
+    public ReverseGeoResponseDTO reverseGeocode(double lat, double lon) {
+        NominatimReverseResponseDTO resultado = nominatimClient.reverseGeocode(lat, lon, "json");
+
+        if (resultado == null || resultado.getAddress() == null) {
+            throw new RuntimeException("Não foi possível determinar o endereço para as coordenadas informadas.");
+        }
+
+        NominatimReverseResponseDTO.Address address = resultado.getAddress();
+        return new ReverseGeoResponseDTO(
+                address.getCidade(),
+                address.getState(),
+                address.getBairro(),
+                address.getRoad(),
+                address.getNumero(),
+                address.getPostcode()
+        );
+    }
+
     public CoordenadasDTO geocodificar(String rua, String bairro, String cidade, String estado, String pais) {
         // Monta a query de busca
         String query = String.format("%s, %s, %s, %s, %s", rua, bairro, cidade, estado, pais);

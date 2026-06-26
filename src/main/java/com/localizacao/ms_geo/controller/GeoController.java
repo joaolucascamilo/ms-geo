@@ -4,6 +4,7 @@ import com.localizacao.ms_geo.dto.EnderecoDTO;
 import com.localizacao.ms_geo.dto.MapaCalorDTO;
 import com.localizacao.ms_geo.dto.OcorrenciaGeoDTO;
 import com.localizacao.ms_geo.dto.OcorrenciaGeoResponseDTO;
+import com.localizacao.ms_geo.dto.ReverseGeoResponseDTO;
 import com.localizacao.ms_geo.model.OcorrenciaGeo;
 import com.localizacao.ms_geo.service.GeoService;
 import jakarta.validation.Valid;
@@ -56,5 +57,14 @@ public class GeoController {
         OcorrenciaGeo salvo = geoService.salvarOcorrencia(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(OcorrenciaGeoResponseDTO.fromEntity(salvo));
+    }
+
+    // Converte coordenadas em cidade/estado via Nominatim
+    @GetMapping("/reverse")
+    public ResponseEntity<ReverseGeoResponseDTO> reverseGeocode(
+            @RequestParam double lat,
+            @RequestParam double lon
+    ) {
+        return ResponseEntity.ok(geoService.reverseGeocode(lat, lon));
     }
 }
