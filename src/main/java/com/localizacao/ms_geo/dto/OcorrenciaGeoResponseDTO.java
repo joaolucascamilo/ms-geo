@@ -16,11 +16,17 @@ public class OcorrenciaGeoResponseDTO {
     @Schema(description = "Categoria da ocorrência", example = "BURACO_NA_VIA")
     private String categoria;
 
+    @Schema(description = "Tipo da ocorrência (alias de categoria)", example = "BURACO_NA_VIA")
+    private String tipo;
+
     @Schema(description = "Status da ocorrência", example = "ABERTA")
     private String status;
 
-    @Schema(description = "Quantidade de denúncias", example = "3")
+    @Schema(description = "Quantidade de denúncias/apoios", example = "3")
     private Integer quantidadeDenuncias;
+
+    @Schema(description = "Endereço formatado da ocorrência", example = "Av. Paulista, Bela Vista, São Paulo")
+    private String endereco;
 
     @Schema(description = "Data e hora de criação", example = "2024-08-15T10:30:00")
     private LocalDateTime dataCriacao;
@@ -31,20 +37,29 @@ public class OcorrenciaGeoResponseDTO {
     @Schema(description = "Longitude em graus decimais (WGS-84)", example = "-46.6543")
     private Double longitude;
 
-    // Converte a entidade para DTO extraindo lat/lng do Point
     public static OcorrenciaGeoResponseDTO fromEntity(OcorrenciaGeo entity) {
         OcorrenciaGeoResponseDTO dto = new OcorrenciaGeoResponseDTO();
         dto.setId(entity.getId());
         dto.setCategoria(entity.getCategoria());
+        dto.setTipo(entity.getCategoria());
         dto.setStatus(entity.getStatus());
         dto.setQuantidadeDenuncias(entity.getQuantidadeDenuncias());
         dto.setDataCriacao(entity.getDataCriacao());
+        dto.setEndereco(formatarEndereco(entity));
 
         if (entity.getLocalizacao() != null) {
-            dto.setLatitude(entity.getLocalizacao().getY());   // Y = latitude
-            dto.setLongitude(entity.getLocalizacao().getX());  // X = longitude
+            dto.setLatitude(entity.getLocalizacao().getY());
+            dto.setLongitude(entity.getLocalizacao().getX());
         }
 
         return dto;
+    }
+
+    private static String formatarEndereco(OcorrenciaGeo entity) {
+        StringBuilder sb = new StringBuilder();
+        if (entity.getRua() != null)    sb.append(entity.getRua());
+        if (entity.getBairro() != null) sb.append(sb.length() > 0 ? ", " : "").append(entity.getBairro());
+        if (entity.getCidade() != null) sb.append(sb.length() > 0 ? ", " : "").append(entity.getCidade());
+        return sb.length() > 0 ? sb.toString() : null;
     }
 }

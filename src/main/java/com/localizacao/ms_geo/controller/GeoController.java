@@ -6,6 +6,7 @@ import com.localizacao.ms_geo.dto.OcorrenciaGeoDTO;
 import com.localizacao.ms_geo.dto.OcorrenciaGeoResponseDTO;
 import com.localizacao.ms_geo.dto.ReverseGeoResponseDTO;
 import com.localizacao.ms_geo.model.OcorrenciaGeo;
+import java.util.Map;
 import com.localizacao.ms_geo.service.GeoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -106,6 +107,26 @@ public class GeoController {
         OcorrenciaGeo salvo = geoService.salvarOcorrencia(dto);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(OcorrenciaGeoResponseDTO.fromEntity(salvo));
+    }
+
+    @Operation(
+        summary = "Sincronizar contador de apoios",
+        description = "Atualiza o campo quantidadeDenuncias de uma ocorrência no ms-geo. " +
+                      "Chamado pelo ms-ocorrencias após um cidadão apoiar uma ocorrência existente."
+    )
+    @ApiResponse(responseCode = "200", description = "Contador atualizado com sucesso",
+        content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+            schema = @Schema(implementation = OcorrenciaGeoResponseDTO.class)))
+    @ApiResponse(responseCode = "404", description = "Ocorrência não encontrada")
+    @PatchMapping("/ocorrencias/{id}/apoiar")
+    public ResponseEntity<OcorrenciaGeoResponseDTO> atualizarApoio(
+            @Parameter(description = "ID da ocorrência", required = true)
+            @PathVariable Long id,
+            @RequestBody Map<String, Integer> body
+    ) {
+        Integer quantidadeDenuncias = body.get("quantidadeDenuncias");
+        OcorrenciaGeo atualizado = geoService.atualizarApoio(id, quantidadeDenuncias);
+        return ResponseEntity.ok(OcorrenciaGeoResponseDTO.fromEntity(atualizado));
     }
 
     @Operation(

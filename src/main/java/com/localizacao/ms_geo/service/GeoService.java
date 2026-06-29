@@ -68,10 +68,22 @@ public class GeoService {
         geo.setStatus(dto.getStatus());
         geo.setQuantidadeDenuncias(dto.getQuantidadeDenuncias());
         geo.setDataCriacao(dto.getDataCriacao());
+        geo.setRua(dto.getRua());
+        geo.setBairro(dto.getBairro());
+        geo.setCidade(dto.getCidade());
+        geo.setEstado(dto.getEstado());
+        geo.setPais(dto.getPais());
         geo.setLocalizacao(
                 geometryFactory.createPoint(new Coordinate(coords.getLongitude(), coords.getLatitude()))
         );
 
+        return repository.save(geo);
+    }
+
+    public OcorrenciaGeo atualizarApoio(Long id, Integer quantidadeDenuncias) {
+        OcorrenciaGeo geo = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada: " + id));
+        geo.setQuantidadeDenuncias(quantidadeDenuncias);
         return repository.save(geo);
     }
 
